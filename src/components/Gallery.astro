@@ -1,0 +1,206 @@
+---
+import { Image } from 'astro:assets';
+import { gallery, tagLabels, type GalleryTag } from '../data/gallery';
+
+interface Props {
+  /** limite le nombre d'images (ex. accueil) */
+  limit?: number;
+  /** affiche les filtres par catégorie */
+  filters?: boolean;
+}
+const { limit, filters = false } = Astro.props;
+const items = limit ? gallery.slice(0, limit) : gallery;
+
+const tags = [...new Set(items.map((i) => i.tag))] as GalleryTag[];
+---
+
+<div class="gallery-wrap">
+  {filters && (
+    <div class="gallery-filters" role="tablist" aria-label="Filtrer les réalisations">
+      <button class="filter active" data-filter="all" type="button">Tout</button>
+      {tags.map((t) => (
+        <button class="filter" data-filter={t} type="button">{tagLabels[t]}</button>
+      ))}
+    </div>
+  )}
+
+  <div class="gallery" data-gallery>
+    {items.map((item, i) => (
+      <figure class="g-item reveal" data-tag={item.tag} style={`--reveal-delay:${(i % 3) * 70}ms`}>
+        <button class="g-btn" type="button" data-index={i} aria-label={`Agrandir : ${item.alt}`}>
+          <Image
+            src={item.src}
+            alt={item.alt}
+            widths={[320, 480, 720]}
+            sizes="(min-width: 980px) 32vw, (min-width: 640px) 48vw, 92vw"
+            loading={i < 4 ? 'eager' : 'lazy'}
+          />
+        </button>
+      </figure>
+    ))}
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" data-lightbox aria-hidden="true" role="dialog" aria-modal="true" aria-label="Visionneuse">
+  <button class="lb-close" data-lb-close type="button" aria-label="Fermer">&times;</button>
+  <button class="lb-nav lb-prev" data-lb-prev type="button" aria-label="Image précédente">&#8249;</button>
+  <figure class="lb-stage">
+    <img data-lb-img src="" alt="" />
+    <figcaption data-lb-cap class="lb-cap"></figcaption>
+  </figure>
+  <button class="lb-nav lb-next" data-lb-next type="button" aria-label="Image suivante">&#8250;</button>
+</div>
+
+<script>
+  import { gallery as galleryData } from '../data/gallery';
+
+  function initGallery() {
+    const root = document.querySelector<HTMLElement>('[data-gallery]');
+    const lb = document.querySelector<HTMLElement>('[data-lightbox]');
+    if (!root || !lb) return;
+
+    const lbImg = lb.querySelector<HTMLImageElement>('[data-lb-img]')!;
+    const lbCap = lb.querySelector<HTMLElement>('[data-lb-cap]')!;
+    const items = Array.from(root.querySelectorAll<HTMLElement>('.g-item'));
+    let current = 0;
+
+    const visibleItems = () => items.filter((it) => it.style.display !== 'none');
+
+    const show = (index: number) => {
+      const vis = visibleItems();
+      if (!vis.length) return;
+      current = (index + vis.length) % vis.length;
+      const el = vis[current];
+      const realIndex = items.indexOf(el);
+      const data = galleryData[realIndex];
+      const imgEl = el.querySelector('img');
+      lbImg.src = imgEl?.currentSrc || imgEl?.src || '';
+      lbImg.alt = data?.alt || '';
+      lbCap.textContent = data?.alt || '';
+    };
+
+    const open = (el: HTMLElement) => {
+      const vis = visibleItems();
+      current = vis.indexOf(el);
+      show(current);
+      lb.classList.add('open');
+      lb.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+    const close = () => {
+      lb.classList.remove('open');
+      lb.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+
+    root.querySelectorAll<HTMLButtonElement>('.g-btn').forEach((btn) => {
+      btn.addEventListener('click', () => open(btn.closest('.g-item') as HTMLElement));
+    });
+
+    lb.querySelector('[data-lb-close]')!.addEventListener('click', close);
+    lb.querySelector('[data-lb-next]')!.addEventListener('click', () => show(current + 1));
+    lb.querySelector('[data-lb-prev]')!.addEventListener('click', () => show(current - 1));
+    lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
+    document.addEventListener('keydown', (e) => {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowRight') show(current + 1);
+      if (e.key === 'ArrowLeft') show(current - 1);
+    });
+
+    // Filtres
+    document.querySelectorAll<HTMLButtonElement>('.filter').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const f = btn.dataset.filter;
+        document.querySelectorAll('.filter').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        items.forEach((it) => {
+          const match = f === 'all' || it.dataset.tag === f;
+          it.style.display = match ? '' : 'none';
+        });
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initGallery);
+</script>
+
+<style>
+  .gallery-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+  }
+  .filter {
+    background: none;
+    border: 1px solid var(--ligne);
+    border-radius: 100px;
+    padding: 0.5rem 1.2rem;
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--texte-doux);
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+  }
+  .filter:hover { border-color: var(--noir); color: var(--texte); }
+  .filter.active { background: var(--noir); border-color: var(--noir); color: var(--creme); }
+
+  .gallery { columns: 1; column-gap: clamp(0.6rem, 1.5vw, 1rem); }
+  @media (min-width: 640px) { .gallery { columns: 2; } }
+  @media (min-width: 980px) { .gallery { columns: 3; } }
+
+  .g-item {
+    break-inside: avoid;
+    margin-bottom: clamp(0.6rem, 1.5vw, 1rem);
+  }
+  .g-btn {
+    display: block; width: 100%; padding: 0; border: none;
+    background: var(--noir-60); cursor: zoom-in;
+    overflow: hidden; border-radius: var(--radius);
+  }
+  .g-btn img {
+    width: 100%; height: auto; display: block;
+    transition: transform 0.7s var(--ease), filter 0.7s var(--ease);
+  }
+  .g-btn:hover img { transform: scale(1.04); filter: brightness(1.03); }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(12, 11, 10, 0.94);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.35s var(--ease), visibility 0.35s;
+    padding: clamp(1rem, 4vw, 3rem);
+  }
+  .lightbox.open { opacity: 1; visibility: visible; }
+  .lb-stage { margin: 0; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+  .lb-stage img {
+    max-width: 100%; max-height: 80vh; width: auto; border-radius: var(--radius);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+  .lb-cap { color: var(--texte-sur-noir-doux); font-size: 0.9rem; letter-spacing: 0.04em; }
+  .lb-close {
+    position: absolute; top: 1rem; right: 1.4rem;
+    background: none; border: none; color: var(--creme);
+    font-size: 2.6rem; line-height: 1; cursor: pointer;
+  }
+  .lb-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--creme);
+    font-size: 3rem; cursor: pointer; padding: 0 1rem; opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+  .lb-nav:hover { opacity: 1; }
+  .lb-prev { left: 0.4rem; }
+  .lb-next { right: 0.4rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .g-btn img, .lightbox { transition: none; }
+  }
+</style>

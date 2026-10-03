@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ServiceUniverse from '../components/ServiceUniverse.astro';
+import ReserveButton from '../components/ReserveButton.astro';
+import { universes } from '../data/services';
+import { site } from '../data/site';
+---
+
+<BaseLayout
+  title="Prestations & tarifs — Le Prestige, coiffeur à Grenoble"
+  description="Tarifs du salon Le Prestige à Grenoble : coupes, coloration, balayage, technique Mounir, Head Spa, soins, lissages, esthétique, épilation laser et ongles."
+  path="/prestations"
+>
+  <section class="page-head">
+    <div class="container">
+      <p class="eyebrow">Prestations & tarifs</p>
+      <h1 class="h-display">Nos prestations</h1>
+      <p class="lead">
+        Coiffure, couleur et beauté réunies. Touchez une prestation pour la déplier,
+        refermez-la pour en choisir une autre. Certaines démarrent « à partir de »
+        selon la longueur et la technique ; la réservation se fait sur Planity.
+      </p>
+    </div>
+  </section>
+
+  <div class="section container prestations-body">
+    <div class="prestations-grid">
+      {universes.map((u, i) => <ServiceUniverse universe={u} index={i} />)}
+    </div>
+
+    <p class="fidelity-note reveal">
+      Tarifs issus de la fiche Planity du salon. Prix susceptibles d'évoluer —
+      les informations à jour font foi sur
+      <a href={site.booking.url} target="_blank" rel="noopener noreferrer" class="link-underline"> Planity</a>.
+    </p>
+  </div>
+
+  <section class="section section--cream cta-strip">
+    <div class="container cta-strip-inner reveal">
+      <div>
+        <h2 class="h-sub">Une question sur une prestation&nbsp;?</h2>
+        <p class="lead">Réservez en ligne ou appelez-nous, on vous conseille.</p>
+      </div>
+      <div class="cta-strip-actions">
+        <ReserveButton variant="gold" label="Réserver" />
+        <a href={site.phoneHref} class="btn btn--outline">{site.phone}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head { padding-block: clamp(3rem, 7vw, 5.5rem) clamp(1.5rem, 3vw, 2.5rem); }
+  .page-head h1 { margin: 0.6rem 0 1.2rem; }
+
+  .prestations-body { padding-top: clamp(1.5rem, 3vw, 2.5rem); }
+
+  .prestations-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(0.8rem, 1.6vw, 1.1rem);
+    align-items: start;
+  }
+  @media (min-width: 620px) { .prestations-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 980px) { .prestations-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  :target { scroll-margin-top: 130px; }
+
+  .fidelity-note {
+    font-size: 0.85rem; color: var(--texte-sur-noir-doux);
+    margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--ligne-sur-noir);
+  }
+
+  .cta-strip-inner { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: center; }
+  .cta-strip-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+</style>
+
+<script>
+  function initPrestations() {
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-acc]'));
+
+    const setOpen = (card: HTMLElement, open: boolean) => {
+      card.classList.toggle('open', open);
+      card.querySelector('[data-acc-toggle]')?.setAttribute('aria-expanded', String(open));
+    };
+
+    cards.forEach((card) => {
+      const btn = card.querySelector<HTMLButtonElement>('[data-acc-toggle]');
+      btn?.addEventListener('click', () => {
+        const willOpen = !card.classList.contains('open');
+        cards.forEach((c) => { if (c !== card) setOpen(c, false); });
+        setOpen(card, willOpen);
+        if (willOpen) {
+          setTimeout(() => {
+            const y = card.getBoundingClientRect().top + window.scrollY - 110;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+          }, 120);
+        }
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', initPrestations);
+</script>

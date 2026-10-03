@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Gallery from '../components/Gallery.astro';
+import ReserveButton from '../components/ReserveButton.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout
+  title="Réalisations — Le Prestige, coiffeur coloriste à Grenoble"
+  description="Galerie des réalisations du salon Le Prestige à Grenoble : balayages, blonds polaires, cuivrés, bruns glacés et coupes. Le savoir-faire couleur de l'équipe."
+  path="/realisations"
+>
+  <section class="page-head">
+    <div class="container">
+      <p class="eyebrow">La galerie</p>
+      <h1 class="h-display">Réalisations</h1>
+      <p class="lead">
+        Un aperçu du travail de l'équipe : balayages fondus, blonds polaires,
+        reflets cuivrés et bruns glacés. Touchez une image pour l'agrandir.
+      </p>
+    </div>
+  </section>
+
+  <div class="section container gallery-section">
+    <Gallery />
+  </div>
+
+  <!-- Instagram -->
+  <section class="section insta-sec">
+    <div class="container insta-inner reveal">
+      <a class="insta-link" href={site.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Voir plus sur Instagram">
+        <span class="insta-text">
+          <span class="insta-h">Bien plus sur notre Instagram</span>
+          <span class="insta-handle">@leprestige_coiffure</span>
+        </span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section section--cream cta-strip">
+    <div class="container cta-strip-inner reveal">
+      <div>
+        <h2 class="h-sub">Envie de la même couleur&nbsp;?</h2>
+        <p class="lead">Prenez rendez-vous, on en parle ensemble.</p>
+      </div>
+      <ReserveButton variant="gold" label="Réserver" />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head { padding-block: clamp(3rem, 7vw, 5.5rem) clamp(1rem, 2vw, 2rem); }
+  .page-head h1 { margin: 0.6rem 0 1.2rem; }
+  .gallery-section { padding-top: clamp(1.5rem, 3vw, 2.5rem); }
+
+  .insta-sec { padding-top: 0; }
+  .insta-inner { display: flex; justify-content: center; }
+  .insta-link {
+    display: inline-flex; align-items: center; gap: clamp(1rem, 3vw, 1.8rem);
+    text-decoration: none; padding: clamp(1.2rem, 3vw, 1.8rem) clamp(1.5rem, 4vw, 2.6rem);
+    border: 1px solid var(--ligne-or); border-radius: 100px;
+    background: var(--noir-60);
+    transition: border-color 0.4s var(--ease), transform 0.4s var(--ease);
+  }
+  .insta-link:hover { border-color: var(--or); transform: translateY(-2px); }
+  .insta-text { display: flex; flex-direction: column; }
+  .insta-h { font-family: var(--serif); font-size: clamp(1.2rem, 1rem + 1vw, 1.7rem); color: var(--creme); }
+  .insta-handle { font-size: 0.85rem; letter-spacing: 0.1em; color: var(--or-clair); }
+  .insta-link .arrow { color: var(--or); font-size: 1.4rem; transition: transform 0.4s var(--ease); }
+  .insta-link:hover .arrow { transform: translateX(5px); }
+
+  .cta-strip-inner { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: center; }
+</style>

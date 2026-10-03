@@ -1,0 +1,126 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/images/logo.png';
+import { site } from '../data/site';
+import ReserveButton from './ReserveButton.astro';
+import { withBase } from '../lib/url';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer dark">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <Image src={logo} alt="Le Prestige — Salon de Coiffure" width={150} height={150} loading="lazy" />
+      <p class="footer-tagline">
+        Salon de coiffure & beauté à Grenoble.<br />Un lieu de raffinement, mixte et familial.
+      </p>
+      <div class="footer-social">
+        <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" class="link-underline">Instagram</a>
+        <a href={site.social.facebook} target="_blank" rel="noopener noreferrer" class="link-underline">Facebook</a>
+      </div>
+    </div>
+
+    <nav class="footer-col" aria-label="Pied de page">
+      <h3 class="footer-h">Navigation</h3>
+      <a href={withBase('/')} class="footer-link">Accueil</a>
+      <a href={withBase('/prestations')} class="footer-link">Prestations & tarifs</a>
+      <a href={withBase('/realisations')} class="footer-link">Réalisations</a>
+      <a href={withBase('/a-propos')} class="footer-link">Le salon</a>
+      <a href={withBase('/contact')} class="footer-link">Contact & accès</a>
+    </nav>
+
+    <div class="footer-col">
+      <h3 class="footer-h">Nous trouver</h3>
+      <address class="footer-address">
+        {site.address.street}<br />
+        {site.address.postalCode} {site.address.city}<br />
+        <a href={site.phoneHref} class="footer-link">{site.phone}</a>
+      </address>
+      <h3 class="footer-h footer-h--mt">Horaires</h3>
+      <ul class="footer-hours">
+        {site.hours.map((h) => (
+          <li class:list={[{ closed: h.closed }]}>
+            <span>{h.day}</span><span>{h.value}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="footer-col footer-cta">
+      <h3 class="footer-h">Prendre rendez-vous</h3>
+      <p class="footer-note">Réservation en ligne sur Planity, 24h/24.</p>
+      <ReserveButton variant="gold" label="Réserver" />
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <p>© {year} Le Prestige — Salon de Coiffure. Tous droits réservés.</p>
+    <nav class="footer-legal" aria-label="Informations légales">
+      <a href={withBase('/mentions-legales')} class="link-underline">Mentions légales</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .site-footer { padding-top: clamp(3.5rem, 7vw, 5.5rem); }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2.2rem, 5vw, 3.5rem);
+    padding-bottom: 3rem;
+    border-bottom: 1px solid rgba(236, 229, 214, 0.12);
+  }
+  .footer-brand img { width: 120px; height: auto; }
+  .footer-tagline { color: var(--texte-sur-noir-doux); font-size: 0.95rem; margin: 1.2rem 0; }
+  .footer-social { display: flex; gap: 1.5rem; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .footer-h {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--or-clair);
+    font-weight: 400;
+    margin-bottom: 1.1rem;
+  }
+  .footer-h--mt { margin-top: 1.8rem; }
+  .footer-col { display: flex; flex-direction: column; }
+  .footer-link {
+    color: var(--texte-sur-noir-doux);
+    text-decoration: none;
+    padding: 0.35rem 0;
+    font-size: 0.95rem;
+    transition: color 0.3s var(--ease);
+    width: fit-content;
+  }
+  .footer-link:hover { color: var(--creme); }
+  .footer-address { font-style: normal; color: var(--texte-sur-noir-doux); line-height: 1.9; }
+
+  .footer-hours { list-style: none; padding: 0; margin: 0; }
+  .footer-hours li {
+    display: flex; justify-content: space-between; gap: 1rem;
+    font-size: 0.9rem; color: var(--texte-sur-noir-doux);
+    padding: 0.25rem 0;
+  }
+  .footer-hours li.closed { opacity: 0.55; }
+  .footer-hours span:first-child { color: var(--texte-sur-noir); }
+
+  .footer-note { color: var(--texte-sur-noir-doux); font-size: 0.9rem; margin: 0 0 1.3rem; }
+  .footer-cta :global(.btn) { width: 100%; }
+
+  .footer-bottom {
+    display: flex; flex-wrap: wrap; gap: 0.8rem;
+    justify-content: space-between; align-items: center;
+    padding-block: 1.6rem;
+    font-size: 0.8rem; color: var(--texte-sur-noir-doux);
+  }
+  .footer-legal a { text-decoration: none; }
+
+  @media (min-width: 640px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (min-width: 980px) {
+    .footer-grid { grid-template-columns: 1.4fr 1fr 1.2fr 1fr; }
+  }
+</style>

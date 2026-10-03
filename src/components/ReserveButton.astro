@@ -1,0 +1,22 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  variant?: 'gold' | 'dark' | 'outline';
+  label?: string;
+  class?: string;
+}
+const { variant = 'gold', label = 'Réserver', class: cls = '' } = Astro.props;
+const variantClass = variant === 'gold' ? 'btn--gold' : variant === 'outline' ? 'btn--outline' : '';
+---
+
+<a
+  class={`btn ${variantClass} ${cls}`}
+  href={site.booking.url}
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  {label}
+  <span class="arrow" aria-hidden="true">→</span>
+  <span class="sr-only">(réservation sur Planity, nouvelle fenêtre)</span>
+</a>

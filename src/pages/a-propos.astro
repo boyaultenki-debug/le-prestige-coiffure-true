@@ -1,0 +1,118 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ReserveButton from '../components/ReserveButton.astro';
+import { site } from '../data/site';
+import salonHero from '../assets/images/salon-hero.png';
+
+const savoirFaire = [
+  { t: 'Blond polaire', d: 'Des blonds froids et lumineux, maîtrisés sans compromis sur la matière.' },
+  { t: 'Technique Mounir', d: "L'ombré libanais, pour des fondus profonds et naturels." },
+  { t: 'Soins & lissages', d: 'Botox capillaire, lissage brésilien, spiruline-tanin et Olaplex.' },
+  { t: 'Beauté & bien-être', d: 'Head Spa, esthétique, épilation laser, ongles et cryolipolyse.' },
+];
+---
+
+<BaseLayout
+  title="Le salon — Le Prestige, coiffure & beauté à Grenoble"
+  description="Le Prestige, un salon de coiffure mixte et familial à Grenoble : une équipe passionnée, l'expertise de la couleur et un espace beauté complet."
+  path="/a-propos"
+>
+  <section class="about-hero">
+    <div class="about-hero-media">
+      <Image src={salonHero} alt="Boucles blondes lumineuses réalisées au salon Le Prestige" widths={[768, 1280, 1920]} sizes="100vw" loading="eager" fetchpriority="high" />
+      <div class="about-hero-scrim"></div>
+    </div>
+    <div class="container about-hero-content">
+      <p class="eyebrow">Le salon</p>
+      <h1 class="h-display">Un écrin de raffinement, rue Lesdiguières</h1>
+      <p class="lead">
+        Le Prestige, c'est un petit bijou de raffinement et de classe au cœur de Grenoble.
+        Un salon mixte et familial, où l'on vient autant pour une coupe que pour prendre
+        un vrai moment pour soi.
+      </p>
+      <p class="about-p">
+        Ce qui fait la différence, c'est la qualité du geste et l'expertise de l'équipe —
+        Sophia, Lydia, Melina, Lola et toute l'équipe — reconnue pour sa couleur, le blond
+        polaire et les techniques les plus pointues. Au fil du temps, le salon s'est agrandi
+        d'un véritable espace beauté : Head Spa, soins du visage, massages, épilation laser,
+        ongles et cryolipolyse.
+      </p>
+    </div>
+  </section>
+
+  <section class="section savoir-sec">
+    <div class="container">
+      <div class="sec-head reveal">
+        <p class="eyebrow centered">Savoir-faire</p>
+        <h2 class="h-section">Ce que l'on aime faire</h2>
+      </div>
+      <ul class="sf-grid">
+        {savoirFaire.map((s, i) => (
+          <li class="sf-card reveal" style={`--reveal-delay:${(i % 2) * 90}ms`}>
+            <h3 class="sf-t">{s.t}</h3>
+            <p class="sf-d">{s.d}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section team-sec">
+    <div class="container team-inner reveal">
+      <div class="ornament" aria-hidden="true"><span>⚜</span></div>
+      <p class="eyebrow centered">L'équipe</p>
+      <h2 class="h-section">Des mains de confiance</h2>
+      <ul class="team-list">
+        {site.team.map((name) => <li>{name}</li>)}
+      </ul>
+      <ReserveButton variant="gold" label="Prendre rendez-vous" />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* HERO — image claire, texte noir lisible par-dessus */
+  .about-hero {
+    position: relative; overflow: hidden;
+    min-height: min(84vh, 740px);
+    display: flex; align-items: center;
+    color: var(--texte);
+  }
+  .about-hero-media { position: absolute; inset: 0; z-index: 0; background: var(--creme-2); }
+  .about-hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+  .about-hero-scrim {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(90deg, rgba(247,241,230,0.96) 0%, rgba(247,241,230,0.78) 40%, rgba(247,241,230,0.3) 70%, rgba(247,241,230,0) 90%),
+      linear-gradient(180deg, rgba(247,241,230,0.25), rgba(247,241,230,0.05));
+  }
+  .about-hero-content { position: relative; z-index: 1; max-width: 640px; padding-block: clamp(4rem, 10vw, 7rem); }
+  .about-hero-content .eyebrow { color: var(--or-fonce); }
+  .about-hero-content .eyebrow::before { background: var(--or); }
+  .about-hero-content h1 { color: var(--noir); margin: 0.6rem 0 1.4rem; }
+  .about-hero-content .lead { color: #433e34; }
+  .about-p { color: #534d42; margin-top: 1.2rem; max-width: 56ch; }
+
+  /* SAVOIR-FAIRE */
+  .sec-head { text-align: center; max-width: 620px; margin: 0 auto clamp(2.5rem, 5vw, 3.5rem); }
+  .sec-head h2 { margin-top: 0.8rem; }
+  .sf-grid { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--ligne-sur-noir); border: 1px solid var(--ligne-sur-noir); }
+  .sf-card { background: var(--noir-60); padding: clamp(1.6rem, 3vw, 2.4rem); }
+  .sf-t { color: var(--or-clair); font-size: 1.4rem; margin: 0 0 0.6rem; }
+  .sf-d { color: var(--texte-sur-noir-doux); margin: 0; }
+  @media (min-width: 720px) { .sf-grid { grid-template-columns: 1fr 1fr; } }
+
+  /* ÉQUIPE (sombre, uniforme) */
+  .team-sec { border-top: 1px solid var(--ligne-sur-noir); }
+  .team-inner { text-align: center; max-width: 640px; margin: 0 auto; }
+  .team-inner h2 { margin: 0.6rem 0 0; }
+  .team-list {
+    list-style: none; padding: 0; margin: 2rem 0 2.5rem;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem;
+  }
+  .team-list li {
+    font-family: var(--serif); font-size: 1.3rem; color: var(--texte-sur-noir);
+    padding: 0.4rem 1.2rem; border: 1px solid var(--ligne-or); border-radius: 100px;
+  }
+</style>

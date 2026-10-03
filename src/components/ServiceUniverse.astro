@@ -1,0 +1,155 @@
+---
+import type { Universe } from '../data/services';
+import { site as siteInfo } from '../data/site';
+
+interface Props {
+  universe: Universe;
+  index: number;
+  open?: boolean;
+}
+const { universe, index, open = false } = Astro.props;
+const num = String(index + 1).padStart(2, '0');
+const panelId = `panel-${universe.id}`;
+---
+
+<article class:list={['u-card', 'reveal', { open }]} id={universe.id} data-acc style={`--reveal-delay:${(index % 3) * 80}ms`}>
+  <button
+    class="u-card-toggle"
+    type="button"
+    aria-expanded={open ? 'true' : 'false'}
+    aria-controls={panelId}
+    data-acc-toggle
+  >
+    <span class="u-card-num">{num}</span>
+    <span class="u-card-face">
+      <span class="u-card-title">{universe.title}</span>
+      <span class="u-card-tag">{universe.tagline}</span>
+    </span>
+    <span class="u-card-icon" aria-hidden="true"></span>
+  </button>
+
+  <div class="u-card-panel" id={panelId} data-acc-panel role="region" aria-label={universe.title}>
+    <div class="u-card-panel-inner">
+      <div class="universe-cats">
+        {universe.categories.map((cat) => (
+          <div class="cat">
+            <h3 class="cat-title">{cat.title}</h3>
+            <ul class="price-list">
+              {cat.items.map((item) => (
+                <li class="price-row">
+                  <div class="price-info">
+                    <span class="price-name">{item.name}</span>
+                    {item.duration && <span class="price-duration">{item.duration}</span>}
+                    {item.note && <span class="price-itemnote">{item.note}</span>}
+                  </div>
+                  <span class="price-value">{item.price}</span>
+                </li>
+              ))}
+            </ul>
+            {cat.partial && (
+              <p class="cat-more">
+                Autres options sur
+                <a href={siteInfo.booking.url} target="_blank" rel="noopener noreferrer" class="link-underline"> Planity</a>.
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  .u-card {
+    position: relative;
+    display: flex; flex-direction: column;
+    background: var(--noir-60);
+    border: 1px solid var(--ligne-sur-noir);
+    overflow: hidden;
+    transition: background 0.4s var(--ease), border-color 0.4s var(--ease);
+  }
+  .u-card:hover { border-color: var(--ligne-or); }
+  .u-card.open { background: var(--noir-40); border-color: var(--ligne-or); grid-column: 1 / -1; }
+
+  .u-card-toggle {
+    position: relative;
+    width: 100%;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    gap: 0.5rem;
+    min-height: 220px;
+    padding: clamp(1.5rem, 2.6vw, 2.2rem);
+    background: none; border: none; cursor: pointer; text-align: left;
+    color: var(--creme);
+    transition: min-height 0.4s var(--ease), padding 0.4s var(--ease);
+  }
+  .u-card.open .u-card-toggle {
+    min-height: 0;
+    justify-content: flex-start;
+    padding-bottom: 0.5rem;
+  }
+
+  .u-card-num {
+    position: absolute; top: clamp(1.5rem, 2.6vw, 2.2rem); left: clamp(1.5rem, 2.6vw, 2.2rem);
+    font-family: var(--serif); color: var(--or); font-size: 1.1rem;
+  }
+  .u-card.open .u-card-num { position: static; }
+  .u-card-face { display: flex; flex-direction: column; gap: 0.5rem; }
+  .u-card-title { font-family: var(--serif); color: var(--creme); font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.2rem); line-height: 1.05; transition: color 0.3s var(--ease); }
+  .u-card-toggle:hover .u-card-title { color: var(--or-clair); }
+  .u-card-tag { color: var(--texte-sur-noir-doux); font-size: 0.92rem; padding-right: 2rem; }
+
+  .u-card-icon {
+    position: absolute; top: clamp(1.5rem, 2.6vw, 2.2rem); right: clamp(1.5rem, 2.6vw, 2.2rem);
+    width: 22px; height: 22px;
+  }
+  .u-card-icon::before, .u-card-icon::after {
+    content: ''; position: absolute; top: 50%; left: 50%; background: var(--or);
+    transition: transform 0.4s var(--ease), opacity 0.4s var(--ease);
+  }
+  .u-card-icon::before { width: 16px; height: 1.5px; transform: translate(-50%, -50%); }
+  .u-card-icon::after { width: 1.5px; height: 16px; transform: translate(-50%, -50%); }
+  .u-card.open .u-card-icon::after { transform: translate(-50%, -50%) rotate(90deg); opacity: 0; }
+
+  .u-card-panel {
+    display: grid; grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s var(--ease);
+  }
+  .u-card.open .u-card-panel { grid-template-rows: 1fr; }
+  .u-card-panel-inner { overflow: hidden; min-height: 0; }
+
+  .universe-cats {
+    display: grid; grid-template-columns: 1fr;
+    gap: clamp(1.8rem, 3.5vw, 3rem) clamp(2.5rem, 6vw, 5rem);
+    padding: 0 clamp(1.5rem, 2.6vw, 2.2rem) clamp(1.8rem, 3vw, 2.5rem);
+  }
+
+  .cat-title {
+    font-family: var(--sans); font-size: 0.76rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--or-clair); font-weight: 500;
+    padding-bottom: 0.8rem; margin: 0 0 0.5rem; border-bottom: 1px solid var(--ligne-or);
+  }
+  .price-list { list-style: none; margin: 0; padding: 0; }
+  .price-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 1.2rem; padding: 0.65rem 0; border-bottom: 1px solid var(--ligne-sur-noir);
+  }
+  .price-row:last-child { border-bottom: none; }
+  .price-info { display: flex; flex-direction: column; gap: 0.15rem; }
+  .price-name { font-size: 1rem; color: var(--texte-sur-noir); }
+  .price-duration { font-size: 0.78rem; color: var(--texte-sur-noir-doux); letter-spacing: 0.04em; }
+  .price-itemnote { font-size: 0.78rem; color: var(--or-clair); font-style: italic; }
+  .price-value { font-family: var(--serif); font-size: 1.2rem; color: var(--creme); white-space: nowrap; flex-shrink: 0; }
+  .cat-more { font-size: 0.85rem; color: var(--texte-sur-noir-doux); margin-top: 0.8rem; }
+
+  /* Quand la carte est ouverte et occupe toute la largeur : 2 colonnes de prix */
+  @media (min-width: 760px) {
+    .u-card.open .universe-cats { grid-template-columns: 1fr 1fr; }
+  }
+  @media (min-width: 1100px) {
+    .u-card.open .universe-cats { grid-template-columns: 1fr 1fr 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .u-card-panel, .u-card-icon::before, .u-card-icon::after, .u-card-toggle { transition: none; }
+  }
+</style>

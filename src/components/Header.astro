@@ -1,0 +1,218 @@
+---
+import ReserveButton from './ReserveButton.astro';
+import { withBase } from '../lib/url';
+
+interface Props {
+  path: string;
+}
+const { path } = Astro.props;
+
+const nav = [
+  { label: 'Accueil', href: '/' },
+  { label: 'Prestations', href: '/prestations' },
+  { label: 'Réalisations', href: '/realisations' },
+  { label: 'Le salon', href: '/a-propos' },
+  { label: 'Contact', href: '/contact' },
+];
+
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+
+<header class="site-header" data-header>
+  <div class="header-inner container">
+    <a class="brand" href={withBase('/')} aria-label="Le Prestige — accueil">
+      <span class="brand-name">Le Prestige</span>
+      <span class="brand-sub">Coiffure</span>
+    </a>
+
+    <nav class="nav-desktop" aria-label="Navigation principale">
+      {nav.map((item) => (
+        <a
+          href={withBase(item.href)}
+          class:list={['nav-link', { active: isActive(item.href) }]}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="header-cta">
+      <ReserveButton variant="gold" class="btn--sm" />
+    </div>
+
+    <button class="burger" data-burger aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobile-menu" data-menu aria-hidden="true">
+  <nav class="mobile-nav" aria-label="Navigation mobile">
+    {nav.map((item) => (
+      <a href={withBase(item.href)} class:list={['mobile-link', { active: isActive(item.href) }]}>
+        {item.label}
+      </a>
+    ))}
+  </nav>
+  <div class="mobile-cta">
+    <ReserveButton variant="gold" label="Réserver en ligne" />
+  </div>
+</div>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--noir) 72%, transparent);
+    backdrop-filter: saturate(140%) blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.4s var(--ease), background 0.4s var(--ease);
+  }
+  .site-header.scrolled {
+    border-bottom-color: var(--ligne-sur-noir);
+    background: color-mix(in srgb, var(--noir) 92%, transparent);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: 74px;
+  }
+
+  .brand { text-decoration: none; display: flex; flex-direction: column; line-height: 1; }
+  .brand-name {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--creme);
+    letter-spacing: 0.01em;
+  }
+  .brand-sub {
+    font-size: 0.62rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--or-clair);
+    padding-left: 0.15rem;
+    margin-top: 0.2rem;
+  }
+
+  .nav-desktop { display: none; gap: clamp(1.4rem, 2.4vw, 2.6rem); }
+  .nav-link {
+    position: relative;
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--texte-sur-noir-doux);
+    padding: 0.4rem 0;
+    transition: color 0.3s var(--ease);
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute; left: 0; bottom: 0;
+    width: 100%; height: 1px; background: var(--or);
+    transform: scaleX(0); transform-origin: right;
+    transition: transform 0.4s var(--ease);
+  }
+  .nav-link:hover { color: var(--creme); }
+  .nav-link:hover::after,
+  .nav-link.active::after { transform: scaleX(1); transform-origin: left; }
+  .nav-link.active { color: var(--creme); }
+
+  .header-cta { display: none; }
+  :global(.btn--sm) { padding: 0.75rem 1.4rem; font-size: 0.74rem; }
+
+  /* Burger */
+  .burger {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 46px; height: 46px;
+    background: none; border: none; cursor: pointer;
+    padding: 0; margin-right: -8px;
+  }
+  .burger span {
+    display: block; height: 1.5px; width: 26px;
+    background: var(--creme); margin-inline: auto;
+    transition: transform 0.35s var(--ease), opacity 0.25s var(--ease);
+  }
+  .site-header.menu-open .burger span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+  .site-header.menu-open .burger span:nth-child(2) { opacity: 0; }
+  .site-header.menu-open .burger span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+  /* Menu mobile */
+  .mobile-menu {
+    position: fixed;
+    inset: 74px 0 0 0;
+    z-index: 90;
+    background: var(--noir);
+    color: var(--creme);
+    padding: clamp(2rem, 8vw, 4rem) var(--gutter) 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transform: translateY(-12px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s var(--ease), transform 0.4s var(--ease), visibility 0.4s;
+  }
+  .mobile-menu.open {
+    opacity: 1; transform: none; visibility: visible;
+  }
+  .mobile-nav { display: flex; flex-direction: column; }
+  .mobile-link {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 9vw, 2.8rem);
+    color: var(--texte-sur-noir);
+    text-decoration: none;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(236, 229, 214, 0.1);
+  }
+  .mobile-link.active { color: var(--or-clair); }
+  .mobile-cta { margin-top: 2rem; }
+  .mobile-cta :global(.btn) { width: 100%; }
+
+  @media (min-width: 900px) {
+    .nav-desktop { display: flex; }
+    .header-cta { display: block; }
+    .burger, .mobile-menu { display: none; }
+  }
+</style>
+
+<script>
+  function initHeader() {
+    const header = document.querySelector<HTMLElement>('[data-header]');
+    const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+    const menu = document.querySelector<HTMLElement>('[data-menu]');
+    if (!header || !burger || !menu) return;
+
+    const close = () => {
+      header.classList.remove('menu-open');
+      menu.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
+      menu.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+
+    burger.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      header.classList.toggle('menu-open', open);
+      burger.setAttribute('aria-expanded', String(open));
+      menu.setAttribute('aria-hidden', String(!open));
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+
+    menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+
+    const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 10);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  document.addEventListener('astro:page-load', initHeader);
+</script>

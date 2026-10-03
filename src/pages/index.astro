@@ -1,0 +1,298 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ReserveButton from '../components/ReserveButton.astro';
+import Gallery from '../components/Gallery.astro';
+import Reviews from '../components/Reviews.astro';
+import emblem from '../assets/images/emblem.png';
+import heroPhoto from '../assets/images/hero.jpg';
+import { site } from '../data/site';
+import { universes } from '../data/services';
+import { headSpaJade, zenImage } from '../data/gallery';
+import { withBase } from '../lib/url';
+
+const businessJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'HairSalon',
+  name: site.fullName,
+  image: new URL('/og-image.png', Astro.site).href,
+  url: Astro.site?.href,
+  telephone: '+33476461866',
+  priceRange: site.priceRange,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address.street,
+    postalCode: site.address.postalCode,
+    addressLocality: site.address.city,
+    addressCountry: site.address.country,
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: site.geo.lat, longitude: site.geo.lng },
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '09:00', closes: '19:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: 'Saturday', opens: '09:00', closes: '17:00' },
+  ],
+  aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.8', reviewCount: site.rating.count },
+  sameAs: [site.social.instagram, site.social.facebook],
+};
+---
+
+<BaseLayout
+  title="Le Prestige — Salon de coiffure & beauté à Grenoble"
+  description="Salon de coiffure mixte et institut de beauté à Grenoble : balayage, blond polaire, technique Mounir, Head Spa, soins et esthétique. Réservation en ligne."
+  path="/"
+  jsonLd={businessJsonLd}
+>
+  <!-- HERO VIDÉO -->
+  <section class="hero">
+    <div class="hero-media">
+      <Image
+        class="hero-img"
+        src={heroPhoto}
+        alt="Chevelure ondulée blond vénitien réalisée au salon Le Prestige"
+        widths={[768, 1280, 1920]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <div class="hero-scrim"></div>
+    </div>
+    <div class="container hero-content">
+      <p class="eyebrow centered-left">Salon de coiffure & beauté · Grenoble</p>
+      <h1 class="h-display hero-title">Le Prestige</h1>
+      <p class="hero-lead">
+        Un écrin de raffinement où la couleur devient une signature.
+        Balayages, blonds polaires et technique Mounir, pensés sur-mesure.
+      </p>
+      <div class="hero-actions">
+        <ReserveButton variant="gold" label="Réserver" />
+        <a href={withBase('/realisations')} class="btn btn--outline">Voir les réalisations <span class="arrow">→</span></a>
+      </div>
+      <p class="hero-rating">
+        <span class="stars" aria-hidden="true">★★★★★</span>
+        <span>{site.rating.value}/5 · {site.rating.count} avis sur {site.rating.source}</span>
+      </p>
+    </div>
+    <span class="hero-scroll" aria-hidden="true"><span></span></span>
+  </section>
+
+  <!-- INTRO -->
+  <section class="section intro">
+    <div class="container intro-grid">
+      <div class="reveal">
+        <p class="eyebrow">Le salon</p>
+        <h2 class="h-section">Le soin du détail, au cœur de Grenoble</h2>
+      </div>
+      <div class="reveal" style="--reveal-delay:120ms">
+        <p class="lead">
+          Rue Lesdiguières, Le Prestige réunit coiffure, couleur et beauté dans un même lieu,
+          mixte et familial. Notre équipe — Sophia, Lydia, Melina, Lola et toute l'équipe —
+          cultive une exigence simple : des gestes maîtrisés et un résultat qui vous ressemble.
+        </p>
+        <a href={withBase('/a-propos')} class="link-underline intro-link">Découvrir le salon →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOS UNIVERS (mosaïque créative) -->
+  <section class="section universes-sec">
+    <div class="container">
+      <div class="sec-head reveal">
+        <p class="eyebrow centered">Nos univers</p>
+        <h2 class="h-section">Tout un art, sous un même toit</h2>
+      </div>
+      <ul class="univers-mosaic">
+        {universes.map((u, i) => (
+          <li class="u-tile reveal" style={`--reveal-delay:${(i % 3) * 90}ms`}>
+            <a href={withBase(`/prestations#${u.id}`)}>
+              <span class="u-tile-num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="u-tile-body">
+                <span class="u-tile-title">{u.title}</span>
+                <span class="u-tile-tag">{u.tagline}</span>
+              </span>
+              <span class="u-tile-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- HEAD SPA -->
+  <section class="section headspa">
+    <div class="container headspa-grid">
+      <div class="headspa-collage">
+        <figure class="hs-img hs-img--2 reveal"><Image src={headSpaJade} alt="Masque de jade pendant le Head Spa" widths={[320, 480, 640]} sizes="(min-width:860px) 24vw, 50vw" loading="lazy" /></figure>
+        <figure class="hs-img hs-img--3 reveal" style="--reveal-delay:140ms"><Image src={zenImage} alt="Ambiance zen et apaisante du Head Spa" widths={[320, 480, 640]} sizes="(min-width:860px) 24vw, 50vw" loading="lazy" /></figure>
+      </div>
+      <div class="headspa-text reveal" style="--reveal-delay:120ms">
+        <p class="eyebrow">Signature bien-être</p>
+        <h2 class="h-section">Le rituel Head&nbsp;Spa</h2>
+        <p class="lead">
+          Une parenthèse japonaise pour le cuir chevelu : massage, chaleur et soins
+          profonds. Trois formules, de la pause relaxante au rituel Le Prestige.
+        </p>
+        <ul class="headspa-list">
+          <li><span>Relaxant · 45 min</span><span>70 €</span></li>
+          <li><span>Équilibre · 1 h</span><span>110 €</span></li>
+          <li><span>Le Prestige · 1 h 30</span><span>135 €</span></li>
+        </ul>
+        <ReserveButton variant="gold" label="Réserver un Head Spa" />
+      </div>
+    </div>
+  </section>
+
+  <!-- RÉALISATIONS (titre + bouton emblème) -->
+  <section class="section realisations-sec">
+    <div class="container">
+      <div class="realisations-head reveal">
+        <div>
+          <p class="eyebrow">La galerie</p>
+          <h2 class="h-section">Nos réalisations</h2>
+        </div>
+        <a class="emblem-btn" href={withBase('/realisations')} data-emblem aria-label="Voir toutes les réalisations">
+          <Image src={emblem} alt="" width={120} height={120} class="emblem-img" />
+          <span class="emblem-ring" aria-hidden="true"></span>
+          <span class="emblem-label">Tout voir</span>
+        </a>
+      </div>
+      <Gallery limit={6} />
+    </div>
+  </section>
+
+  <!-- AVIS -->
+  <Reviews />
+
+  <!-- CTA FINAL (accent crème) -->
+  <section class="section section--cream cta-final">
+    <div class="container cta-inner reveal">
+      <p class="eyebrow centered">Prêt·e à prendre soin de vous&nbsp;?</p>
+      <h2 class="h-display cta-title">Réservez votre rendez-vous</h2>
+      <p class="lead" style="margin-inline:auto;text-align:center">
+        En ligne, 24h/24, sur Planity — ou par téléphone pendant les heures d'ouverture.
+      </p>
+      <div class="hero-actions" style="justify-content:center">
+        <ReserveButton variant="gold" label="Réserver en ligne" />
+        <a href={site.phoneHref} class="btn btn--outline">{site.phone}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* HERO */
+  .hero { position: relative; min-height: min(92vh, 820px); display: flex; align-items: flex-end; color: var(--creme); overflow: hidden; }
+  .hero-media { position: absolute; inset: 0; z-index: 0; background: var(--noir); overflow: hidden; }
+  .hero-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: 60% center;
+    display: block;
+  }
+  @media (max-width: 680px) { .hero-img { object-position: 64% center; } }
+  .hero-scrim {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(12,11,10,0.5) 0%, rgba(12,11,10,0.28) 44%, rgba(12,11,10,0.9) 100%),
+      linear-gradient(90deg, rgba(12,11,10,0.88) 0%, rgba(12,11,10,0.45) 45%, rgba(12,11,10,0.05) 82%);
+  }
+  .hero-content { position: relative; z-index: 1; padding-block: clamp(3rem, 8vw, 6rem); max-width: 760px; }
+  .centered-left { color: var(--or-clair); }
+  .hero-title { color: var(--creme); margin: 0.6rem 0 1.2rem; }
+  .hero-lead { font-size: clamp(1.05rem, 1rem + 0.5vw, 1.35rem); max-width: 48ch; color: rgba(236,229,214,0.92); }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; }
+  .hero-rating { display: flex; align-items: center; gap: 0.7rem; margin-top: 2rem; font-size: 0.9rem; color: rgba(236,229,214,0.85); }
+  .stars { color: var(--or-clair); letter-spacing: 0.1em; }
+  .hero-scroll { position: absolute; left: 50%; bottom: 1.4rem; z-index: 1; width: 22px; height: 34px; border: 1px solid rgba(236,229,214,0.4); border-radius: 12px; transform: translateX(-50%); }
+  .hero-scroll span { position: absolute; left: 50%; top: 7px; width: 3px; height: 7px; background: var(--or-clair); border-radius: 2px; transform: translateX(-50%); animation: scrolldot 1.8s var(--ease) infinite; }
+  @keyframes scrolldot { 0% { opacity: 0; transform: translate(-50%, 0); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, 12px); } }
+
+  /* INTRO */
+  .intro-grid { display: grid; gap: clamp(1.5rem, 4vw, 3.5rem); }
+  .intro-link { display: inline-block; margin-top: 1.4rem; color: var(--or-clair); font-size: 0.9rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  @media (min-width: 820px) { .intro-grid { grid-template-columns: 0.9fr 1.1fr; align-items: start; } }
+
+  /* SECTION HEADS */
+  .sec-head { text-align: center; max-width: 640px; margin: 0 auto clamp(2.5rem, 5vw, 4rem); }
+  .sec-head h2 { margin-top: 0.8rem; }
+
+  /* UNIVERS — mosaïque */
+  .univers-mosaic {
+    list-style: none; padding: 0; margin: 0;
+    display: grid; grid-template-columns: 1fr; gap: clamp(0.8rem, 1.6vw, 1.1rem);
+  }
+  .u-tile a {
+    position: relative; display: flex; flex-direction: column; justify-content: space-between;
+    height: 100%; min-height: 180px; padding: clamp(1.5rem, 2.6vw, 2.2rem);
+    background: var(--noir-60); border: 1px solid var(--ligne-sur-noir);
+    text-decoration: none; overflow: hidden;
+    transition: background 0.45s var(--ease), border-color 0.45s var(--ease), transform 0.45s var(--ease);
+  }
+  .u-tile a::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(120% 120% at 100% 0%, rgba(199,162,76,0.14), transparent 60%);
+    opacity: 0; transition: opacity 0.45s var(--ease);
+  }
+  .u-tile a:hover { background: var(--noir-40); border-color: var(--ligne-or); transform: translateY(-4px); }
+  .u-tile a:hover::before { opacity: 1; }
+  .u-tile-num { font-family: var(--serif); color: var(--or); font-size: 1.1rem; }
+  .u-tile-body { display: flex; flex-direction: column; gap: 0.5rem; margin-top: auto; }
+  .u-tile-title { font-family: var(--serif); color: var(--creme); font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.1rem); line-height: 1.05; }
+  .u-tile-tag { color: var(--texte-sur-noir-doux); font-size: 0.92rem; padding-right: 1.5rem; }
+  .u-tile-arrow { position: absolute; top: clamp(1.5rem,2.6vw,2.2rem); right: clamp(1.5rem,2.6vw,2.2rem); color: var(--or); opacity: 0; transform: translate(-6px, 0); transition: all 0.45s var(--ease); }
+  .u-tile a:hover .u-tile-arrow { opacity: 1; transform: none; }
+
+  @media (min-width: 620px) {
+    .univers-mosaic { grid-template-columns: 1fr 1fr; grid-auto-rows: 200px; }
+    .u-tile:nth-child(1), .u-tile:nth-child(6) { grid-row: span 2; }
+    .u-tile a { min-height: 0; }
+  }
+  @media (min-width: 980px) {
+    .univers-mosaic { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 210px; }
+    .u-tile:nth-child(1), .u-tile:nth-child(6) { grid-row: span 2; }
+  }
+
+  /* HEAD SPA */
+  .headspa-grid { display: grid; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+  .headspa-collage { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.6rem, 1.5vw, 1rem); }
+  .hs-img { margin: 0; overflow: hidden; border-radius: var(--radius); }
+  .hs-img img { width: 100%; height: 100%; object-fit: cover; }
+  .hs-img--2, .hs-img--3 { aspect-ratio: 4/5; }
+  .hs-img--3 { margin-top: clamp(1.5rem, 4vw, 3rem); }
+  .headspa-list { list-style: none; padding: 0; margin: 1.8rem 0 2rem; }
+  .headspa-list li { display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid var(--ligne-sur-noir); }
+  .headspa-list li span:last-child { font-family: var(--serif); font-size: 1.2rem; color: var(--creme); }
+  @media (min-width: 860px) { .headspa-grid { grid-template-columns: 1.05fr 0.95fr; } }
+
+  /* RÉALISATIONS */
+  .realisations-head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 1.5rem; margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+  .realisations-head h2 { margin-top: 0.7rem; }
+
+  .emblem-btn {
+    position: relative; flex-shrink: 0;
+    display: inline-flex; flex-direction: column; align-items: center; gap: 0.6rem;
+    text-decoration: none;
+  }
+  .emblem-img {
+    width: clamp(68px, 14vw, 104px); height: auto; border-radius: 50%;
+    transition: transform 0.5s var(--ease);
+  }
+  .emblem-ring {
+    position: absolute; top: 0; left: 50%; width: clamp(68px, 14vw, 104px); aspect-ratio: 1;
+    transform: translateX(-50%); border-radius: 50%; border: 1px solid var(--or);
+    opacity: 0.5; transition: transform 0.6s var(--ease), opacity 0.6s var(--ease);
+  }
+  .emblem-btn:hover .emblem-img { transform: scale(1.06); }
+  .emblem-btn:hover .emblem-ring { transform: translateX(-50%) scale(1.25); opacity: 0; }
+  .emblem-label { font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--or-clair); }
+
+  /* CTA FINAL */
+  .cta-inner { text-align: center; max-width: 720px; margin: 0 auto; }
+  .cta-title { margin: 0.6rem 0 1rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-scroll span { animation: none; }
+  }
+</style>

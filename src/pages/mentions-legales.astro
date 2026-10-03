@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../data/site';
+---
+
+<BaseLayout
+  title="Mentions légales — Le Prestige, Grenoble"
+  description="Mentions légales du site du salon Le Prestige à Grenoble."
+  path="/mentions-legales"
+>
+  <section class="section section--cream container legal">
+    <p class="eyebrow">Informations légales</p>
+    <h1 class="h-section">Mentions légales</h1>
+
+    <div class="legal-note">
+      <strong>À compléter par le client.</strong> Les champs ci-dessous marqués
+      « À FOURNIR » doivent être renseignés avant la mise en ligne. Aucune information
+      juridique n'a été inventée.
+    </div>
+
+    <h2>Éditeur du site</h2>
+    <p>
+      Raison sociale : <em>À FOURNIR</em><br />
+      Forme juridique : <em>À FOURNIR</em><br />
+      Adresse : {site.address.street}, {site.address.postalCode} {site.address.city}<br />
+      Téléphone : <a href={site.phoneHref} class="link-underline">{site.phone}</a><br />
+      SIREN / SIRET : <em>À FOURNIR</em><br />
+      N° TVA intracommunautaire : <em>À FOURNIR</em><br />
+      Directeur / responsable de la publication : <em>À FOURNIR</em>
+    </p>
+
+    <h2>Hébergement</h2>
+    <p>
+      Hébergeur : <em>À FOURNIR</em><br />
+      Adresse de l'hébergeur : <em>À FOURNIR</em>
+    </p>
+
+    <h2>Propriété intellectuelle</h2>
+    <p>
+      L'ensemble des contenus (textes, photographies, logo) présents sur ce site est la
+      propriété de Le Prestige ou de ses ayants droit. Toute reproduction sans autorisation
+      est interdite.
+    </p>
+
+    <h2>Données personnelles</h2>
+    <p>
+      Ce site ne collecte pas de données personnelles via un formulaire. La prise de
+      rendez-vous s'effectue sur la plateforme externe Planity, soumise à sa propre
+      politique de confidentialité. La consultation du plan d'accès s'appuie sur Google Maps.
+    </p>
+
+    <h2>Médiation de la consommation</h2>
+    <p>
+      Conformément à la réglementation, les coordonnées du médiateur de la consommation
+      seront indiquées ici : <em>À FOURNIR</em>.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal { max-width: 760px; }
+  .legal h1 { margin: 0.6rem 0 1.5rem; }
+  .legal h2 { font-size: 1.4rem; margin: 2.2rem 0 0.6rem; }
+  .legal p { color: var(--texte-doux); }
+  .legal-note {
+    background: var(--creme-2); border-left: 3px solid var(--or);
+    padding: 1.1rem 1.3rem; border-radius: var(--radius);
+    font-size: 0.92rem; margin-bottom: 2rem;
+  }
+  .legal em { color: var(--or-fonce); font-style: normal; background: color-mix(in srgb, var(--or) 14%, transparent); padding: 0.05em 0.4em; border-radius: 2px; }
+</style>

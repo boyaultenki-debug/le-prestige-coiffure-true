@@ -1,0 +1,139 @@
+---
+import { reviews } from '../data/reviews';
+import { site } from '../data/site';
+---
+
+<section class="section reviews-sec">
+  <div class="container">
+    <div class="reviews-head reveal">
+      <div>
+        <p class="eyebrow">Ils nous font confiance</p>
+        <h2 class="h-section">Ce que disent nos client·es</h2>
+        <p class="reviews-score">
+          <span class="stars" aria-hidden="true">★★★★★</span>
+          {site.rating.value}/5 · {site.rating.count} avis sur {site.rating.source}
+        </p>
+      </div>
+      <div class="reviews-nav" aria-hidden="true">
+        <button class="rev-arrow" data-rev-prev type="button" aria-label="Avis précédents">&#8249;</button>
+        <button class="rev-arrow" data-rev-next type="button" aria-label="Avis suivants">&#8250;</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews-track" data-reviews tabindex="0" aria-label="Avis clients, faites défiler horizontalement">
+    <div class="reviews-rail">
+      {reviews.map((r, i) => (
+        <article class="review-card reveal" style={`--reveal-delay:${(i % 4) * 70}ms`}>
+          <span class="review-stars" aria-label={`${r.rating} sur 5`}>★★★★★</span>
+          <p class="review-text">{r.text}</p>
+          <footer class="review-meta">
+            <span class="review-badge">✓</span>
+            <span>Client vérifié · {site.rating.source}</span>
+            <span class="review-date">{r.date}</span>
+          </footer>
+        </article>
+      ))}
+      <a class="review-card review-card--cta" href={site.booking.url} target="_blank" rel="noopener noreferrer">
+        <span>Voir tous les avis<br />sur Planity</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .reviews-sec { overflow: hidden; }
+  .reviews-head {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 1.5rem; margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+  .reviews-head h2 { margin: 0.7rem 0 0.9rem; }
+  .reviews-score { display: flex; align-items: center; gap: 0.6rem; color: var(--texte-sur-noir-doux); font-size: 0.95rem; margin: 0; }
+  .stars { color: var(--or-clair); letter-spacing: 0.1em; }
+
+  .reviews-nav { display: none; gap: 0.6rem; flex-shrink: 0; }
+  .rev-arrow {
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 1px solid var(--ligne-sur-noir); background: transparent;
+    color: var(--creme); font-size: 1.4rem; cursor: pointer;
+    transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+  }
+  .rev-arrow:hover { border-color: var(--or); color: var(--or-clair); }
+
+  .reviews-track {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-inline: var(--gutter);
+    padding-bottom: 0.5rem;
+  }
+  .reviews-track::-webkit-scrollbar { display: none; }
+  .reviews-rail {
+    display: flex; gap: clamp(1rem, 2vw, 1.4rem);
+    width: max-content;
+    max-width: var(--maxw);
+    margin-inline: auto;
+  }
+
+  .review-card {
+    scroll-snap-align: start;
+    flex: 0 0 clamp(260px, 78vw, 360px);
+    display: flex; flex-direction: column;
+    background: var(--noir-60);
+    border: 1px solid var(--ligne-sur-noir);
+    border-radius: 6px;
+    padding: clamp(1.5rem, 3vw, 2rem);
+    min-height: 240px;
+  }
+  .review-stars { color: var(--or); letter-spacing: 0.12em; font-size: 0.95rem; }
+  .review-text {
+    font-family: var(--serif);
+    font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
+    line-height: 1.45; color: var(--creme);
+    margin: 1rem 0 auto; font-style: italic;
+  }
+  .review-meta {
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    font-size: 0.78rem; color: var(--texte-sur-noir-doux);
+    margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid var(--ligne-sur-noir);
+  }
+  .review-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--or); color: var(--noir); font-size: 0.7rem;
+  }
+  .review-date { margin-left: auto; }
+
+  .review-card--cta {
+    justify-content: space-between; text-decoration: none;
+    background: transparent; border-style: dashed; border-color: var(--ligne-or);
+    color: var(--or-clair);
+    font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
+    transition: background 0.3s var(--ease);
+  }
+  .review-card--cta:hover { background: var(--noir-40); }
+  .review-card--cta .arrow { font-size: 1.6rem; transition: transform 0.4s var(--ease); }
+  .review-card--cta:hover .arrow { transform: translateX(5px); }
+
+  @media (min-width: 760px) {
+    .reviews-nav { display: flex; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reviews-track { scroll-behavior: auto; }
+  }
+</style>
+
+<script>
+  function initReviews() {
+    const track = document.querySelector<HTMLElement>('[data-reviews]');
+    if (!track) return;
+    const prev = document.querySelector<HTMLButtonElement>('[data-rev-prev]');
+    const next = document.querySelector<HTMLButtonElement>('[data-rev-next]');
+    const amount = () => Math.min(track.clientWidth * 0.8, 400);
+    prev?.addEventListener('click', () => track.scrollBy({ left: -amount(), behavior: 'smooth' }));
+    next?.addEventListener('click', () => track.scrollBy({ left: amount(), behavior: 'smooth' }));
+  }
+  document.addEventListener('astro:page-load', initReviews);
+</script>

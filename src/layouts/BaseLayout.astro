@@ -1,0 +1,113 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+import { withBase } from '../lib/url';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** chemin relatif, ex. "/prestations" */
+  path: string;
+  /** JSON-LD additionnel injecté dans le head */
+  jsonLd?: Record<string, unknown>;
+}
+
+const { title, description, path, jsonLd } = Astro.props;
+const canonical = new URL(withBase(path), Astro.site).href;
+const ogImage = new URL(withBase('/og-image.png'), Astro.site).href;
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#100f0d" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.fullName} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="fr_FR" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href={withBase('/favicon.png')} />
+    <link rel="apple-touch-icon" href={withBase('/favicon.png')} />
+
+    <!-- Polices -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@300;400;500&display=swap"
+    />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Aller au contenu</a>
+    <Header path={path} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      // Révélation au scroll — réinitialisée après chaque navigation (View Transitions)
+      function initReveals() {
+        const els = document.querySelectorAll<HTMLElement>('.reveal:not(.is-in)');
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduce || !('IntersectionObserver' in window)) {
+          els.forEach((el) => el.classList.add('is-in'));
+          return;
+        }
+        const io = new IntersectionObserver(
+          (entries, obs) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-in');
+                obs.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+        );
+        els.forEach((el) => io.observe(el));
+      }
+
+      document.addEventListener('astro:page-load', initReveals);
+    </script>
+
+    <style is:global>
+      /* Transition de page : fondu rapide + révélation circulaire vers l'extérieur */
+      @keyframes pt-fade-out { from { opacity: 1; } to { opacity: 0; } }
+      @keyframes pt-reveal {
+        from { clip-path: circle(0% at 50% 50%); opacity: 0.35; }
+        to   { clip-path: circle(135% at 50% 50%); opacity: 1; }
+      }
+      ::view-transition-old(root) {
+        animation: pt-fade-out 0.22s ease forwards;
+      }
+      ::view-transition-new(root) {
+        animation: pt-reveal 0.5s var(--ease) forwards;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        ::view-transition-old(root),
+        ::view-transition-new(root) { animation: none; }
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ReserveButton from '../components/ReserveButton.astro';
+import { site } from '../data/site';
+
+const mapQuery = encodeURIComponent(`${site.address.street} ${site.address.postalCode} ${site.address.city}`);
+---
+
+<BaseLayout
+  title="Contact & accès — Le Prestige, Grenoble"
+  description="Le Prestige — 41 rue Lesdiguières, 38000 Grenoble. Horaires, téléphone, plan d'accès et réservation en ligne du salon de coiffure."
+  path="/contact"
+>
+  <section class="page-head">
+    <div class="container">
+      <p class="eyebrow">Contact & accès</p>
+      <h1 class="h-display">Nous rendre visite</h1>
+      <p class="lead">En plein centre de Grenoble, rue Lesdiguières. Réservation en ligne 24h/24.</p>
+    </div>
+  </section>
+
+  <section class="section container contact-grid">
+    <div class="contact-info reveal">
+      <div class="info-block">
+        <h2 class="info-h">Adresse</h2>
+        <address>
+          {site.address.street}<br />{site.address.postalCode} {site.address.city}
+        </address>
+        <a href={site.maps} target="_blank" rel="noopener noreferrer" class="link-underline info-link">Ouvrir dans Google Maps →</a>
+      </div>
+
+      <div class="info-block">
+        <h2 class="info-h">Téléphone</h2>
+        <a href={site.phoneHref} class="info-phone">{site.phone}</a>
+      </div>
+
+      <div class="info-block">
+        <h2 class="info-h">Horaires</h2>
+        <ul class="hours">
+          {site.hours.map((h) => (
+            <li class:list={[{ closed: h.closed }]}><span>{h.day}</span><span>{h.value}</span></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="info-block">
+        <h2 class="info-h">Suivez-nous</h2>
+        <div class="socials">
+          <a href={site.social.instagram} target="_blank" rel="noopener noreferrer" class="link-underline">Instagram</a>
+          <a href={site.social.facebook} target="_blank" rel="noopener noreferrer" class="link-underline">Facebook</a>
+        </div>
+      </div>
+
+      <ReserveButton variant="gold" label="Réserver en ligne" />
+    </div>
+
+    <div class="contact-map reveal" style="--reveal-delay:120ms">
+      <iframe
+        title="Plan d'accès au salon Le Prestige"
+        src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head { padding-block: clamp(3rem, 7vw, 5.5rem) clamp(1rem, 2vw, 2rem); }
+  .page-head h1 { margin: 0.6rem 0 1.2rem; }
+
+  .contact-grid { display: grid; gap: clamp(2rem, 5vw, 3.5rem); align-items: start; }
+  .info-block { padding-bottom: 1.6rem; margin-bottom: 1.6rem; border-bottom: 1px solid var(--ligne-sur-noir); }
+  .info-h {
+    font-family: var(--sans); font-size: 0.74rem; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--or-fonce); font-weight: 500; margin: 0 0 0.8rem;
+  }
+  address { font-style: normal; font-size: 1.15rem; line-height: 1.7; }
+  .info-link { display: inline-block; margin-top: 0.8rem; font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--texte-sur-noir-doux); }
+  .info-phone { font-family: var(--serif); font-size: 1.8rem; text-decoration: none; }
+  .hours { list-style: none; padding: 0; margin: 0; max-width: 340px; }
+  .hours li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.35rem 0; }
+  .hours li.closed { opacity: 0.5; }
+  .socials { display: flex; gap: 1.5rem; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.1em; }
+
+  .contact-map { overflow: hidden; border-radius: var(--radius); border: 1px solid var(--ligne-sur-noir); min-height: 420px; }
+  .contact-map iframe { width: 100%; height: 100%; min-height: 420px; border: 0; display: block; filter: grayscale(0.3) invert(0.92) contrast(0.9) hue-rotate(180deg); }
+
+  @media (min-width: 860px) { .contact-grid { grid-template-columns: 0.9fr 1.1fr; } }
+</style>

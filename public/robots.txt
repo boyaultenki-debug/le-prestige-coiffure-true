@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Remplace l'URL ci-dessous par celle de ton site (= SITE dans astro.config.mjs)
+Sitemap: https://TONPSEUDO.github.io/sitemap-index.xml
